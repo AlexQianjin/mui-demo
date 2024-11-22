@@ -5,6 +5,7 @@ import './App.css';
 import Search from './components/Search';
 
 import { Button } from '@mui/material';
+import { cn } from './lib/utils';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -30,6 +31,7 @@ function App() {
       <Search />
       <Button color='primary'>Primary</Button>
       <Button color='secondary'>Secondary</Button>
+      <h1 className={cn('text-3xl font-bold underline text-red-600', count === 2 && 'text-blue-500')}>Hello world!</h1>
     </>
   );
 }

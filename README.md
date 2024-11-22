@@ -57,3 +57,9 @@ pnpm exec prettier . --write
 npx prettier . --check
 pnpm add --save-dev eslint-config-prettier
 ```
+
+## tailwild css
+```
+pnpm add --save-dev tailwindcss postcss autoprefixer
+pnpm dlx tailwindcss init -p
+```
