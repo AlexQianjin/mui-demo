@@ -8,5 +8,6 @@
   "proseWrap": "preserve",
   "endOfLine": "crlf",
   "useTabs": false,
-  "jsxSingleQuote": true
+  "jsxSingleQuote": true,
+  "plugins": ["prettier-plugin-tailwindcss"]
 }
