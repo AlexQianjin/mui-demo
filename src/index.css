@@ -130,3 +130,13 @@ button:focus-visible {
     background-position: -100px 0;
   }
 }
+
+@keyframes progress-bar-stripes {
+  0% {
+    background-position: 40px 0;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}

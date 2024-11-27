@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
@@ -33,6 +33,17 @@ const StrippedLinearProgress = styled(LinearProgress)`
 
 function App() {
   const [count, setCount] = useState(0);
+  const [percent, setPercent] = useState(0);
+  // const progress = useRef(5);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPercent(percent => (percent < 100 ? (percent += 5) : 100));
+    }, 1000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
   return (
     <>
@@ -76,7 +87,7 @@ function App() {
           className='striped-background-green'
           sx={{ position: 'absolute', top: 0, left: 0, width: '100%' }}
           variant='determinate'
-          value={50}
+          value={percent}
         />
       </div>
     </>
