@@ -3,6 +3,8 @@ import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
 import Search from './components/Search';
+import { ThemeToggle } from './components/ThemeToggle';
+import { Card } from './components/Card';
 
 import { styled } from '@mui/material/styles';
 import { Button } from '@mui/material';
@@ -89,6 +91,29 @@ function App() {
           variant='determinate'
           value={percent}
         />
+        <div className='min-h-screen bg-gray-100 transition-colors dark:bg-gray-900'>
+          <div className='container mx-auto px-4 py-8'>
+            <div className='mb-8 flex items-center justify-between'>
+              <h1 className='text-2xl font-bold text-gray-800 dark:text-white'>Theme Switcher Demo</h1>
+              <ThemeToggle />
+            </div>
+
+            <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+              <Card
+                title='Understanding Context'
+                content='React Context provides a way to pass data through the component tree without having to pass props manually at every level.'
+              />
+              <Card
+                title='When to Use Context'
+                content="Context is designed to share data that can be considered 'global' for a tree of React components, such as the current theme."
+              />
+              <Card
+                title='Context vs Props'
+                content='For many applications, Context is a good way to share values like these between components without explicitly passing a prop through every level of the tree.'
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

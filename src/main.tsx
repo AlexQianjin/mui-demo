@@ -6,12 +6,15 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 
 import theme from './theme/theme.tsx';
+import { ThemeModeProvider } from './contexts/ThemeModeContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <App />
+      <ThemeModeProvider>
+        <App />
+      </ThemeModeProvider>
     </ThemeProvider>
   </StrictMode>
 );
