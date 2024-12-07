@@ -11,6 +11,13 @@ import { Button } from '@mui/material';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
 import { cn } from './lib/utils';
+import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+import duration from 'dayjs/plugin/duration';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(advancedFormat);
+dayjs.extend(duration);
+dayjs.extend(utc);
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 20,
@@ -33,6 +40,66 @@ const StrippedLinearProgress = styled(LinearProgress)`
   background-color: unset;
 `;
 
+export interface TimePeriod {
+  start: number;
+  end: number;
+}
+
+function displayTotalDuration(timePeriods: TimePeriod[]): string {
+  if (timePeriods == null || timePeriods.length === 0) {
+    return '';
+  }
+
+  timePeriods.sort((a: TimePeriod, b: TimePeriod) => a.start - b.start);
+
+  const durations: TimePeriod[] = [];
+
+  durations.push({
+    start: timePeriods[0].start,
+    end: timePeriods[0].end
+  });
+  let curIndex = 0;
+  for (const timePeriod of timePeriods) {
+    if (timePeriod.start > durations[curIndex].end) {
+      durations.push({
+        start: timePeriod.start,
+        end: timePeriod.end
+      });
+      curIndex += 1;
+    } else if (timePeriod.end > durations[curIndex].end) {
+      durations[curIndex].end = timePeriod.end;
+    }
+  }
+
+  let totalDuration: duration.Duration = dayjs.duration(0);
+  console.log(75, totalDuration);
+  for (const duration of durations) {
+    // const n = dayjs.unix(duration.end).diff(dayjs.unix(duration.start));
+    // console.log(n);
+    // totalDuration = totalDuration.add(n, 'milliseconds');
+    totalDuration = totalDuration.add(dayjs.duration(dayjs.unix(duration.end).diff(dayjs.unix(duration.start))));
+  }
+  console.log(80, totalDuration);
+  const days: number = Math.floor(totalDuration.asDays());
+
+  return (days === 0 ? '' : `${days} Days `).concat(dayjs.utc(totalDuration.as('milliseconds')).format('HH:mm:ss'));
+}
+
+function testTotalDuration() {
+  const starts: number[] = [1555448042, 1555445266, 1555442823, 1555442419, 1555442385, 1555442011, 1555442003, 1555440982];
+  const ends: number[] = [1555448052, 1555445271, 1555445210, 1555442822, 1555442419, 1555442385, 1555442011, 1555442003];
+
+  const timePeriods: TimePeriod[] = [];
+  for (let i: number = 0; i < starts.length; i = i + 1) {
+    timePeriods.push({
+      start: starts[i],
+      end: ends[i]
+    });
+  }
+
+  console.log(displayTotalDuration(timePeriods));
+}
+
 function App() {
   const [count, setCount] = useState(0);
   const [percent, setPercent] = useState(0);
@@ -47,6 +114,8 @@ function App() {
     };
   }, []);
 
+  testTotalDuration();
+
   return (
     <>
       <div>
@@ -57,7 +126,10 @@ function App() {
           <img src={reactLogo} className='logo react' alt='React logo' />
         </a>
       </div>
-      <h1>Vite + React</h1>
+      <h1>Vite + React {dayjs('2012-05-28 10:21:15').format('X')}</h1>
+      <p>{dayjs().toString()}</p>
+      <p>{dayjs().format('YYYY-MM-DD,HH-mm')}</p>
+      <p>{dayjs().subtract(7, 'year').format('YYYY-MM-DDTHH:mm')}</p>
       <div className='card'>
         <button onClick={() => setCount(count => count + 1)}>count is {count}</button>
         <p>
