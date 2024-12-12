@@ -63,3 +63,10 @@ pnpm add --save-dev eslint-config-prettier
 pnpm add --save-dev tailwindcss postcss autoprefixer
 pnpm dlx tailwindcss init -p
 ```
+
+## pnpm proxy
+```
+touch .npmrc
+http-proxy=http://127.0.0.1:10809
+https-proxy=http://127.0.0.1:10809
+```
