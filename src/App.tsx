@@ -10,7 +10,7 @@ import { styled } from '@mui/material/styles';
 import { Button } from '@mui/material';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
-import { cn } from './lib/utils';
+import { cn, TimePeriod } from './lib/utils';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import duration from 'dayjs/plugin/duration';
@@ -40,51 +40,6 @@ const StrippedLinearProgress = styled(LinearProgress)`
   background-color: unset;
 `;
 
-export interface TimePeriod {
-  start: number;
-  end: number;
-}
-
-function displayTotalDuration(timePeriods: TimePeriod[]): string {
-  if (timePeriods == null || timePeriods.length === 0) {
-    return '';
-  }
-
-  timePeriods.sort((a: TimePeriod, b: TimePeriod) => a.start - b.start);
-
-  const durations: TimePeriod[] = [];
-
-  durations.push({
-    start: timePeriods[0].start,
-    end: timePeriods[0].end
-  });
-  let curIndex = 0;
-  for (const timePeriod of timePeriods) {
-    if (timePeriod.start > durations[curIndex].end) {
-      durations.push({
-        start: timePeriod.start,
-        end: timePeriod.end
-      });
-      curIndex += 1;
-    } else if (timePeriod.end > durations[curIndex].end) {
-      durations[curIndex].end = timePeriod.end;
-    }
-  }
-
-  let totalDuration: duration.Duration = dayjs.duration(0);
-  console.log(75, totalDuration);
-  for (const duration of durations) {
-    // const n = dayjs.unix(duration.end).diff(dayjs.unix(duration.start));
-    // console.log(n);
-    // totalDuration = totalDuration.add(n, 'milliseconds');
-    totalDuration = totalDuration.add(dayjs.duration(dayjs.unix(duration.end).diff(dayjs.unix(duration.start))));
-  }
-  console.log(80, totalDuration);
-  const days: number = Math.floor(totalDuration.asDays());
-
-  return (days === 0 ? '' : `${days} Days `).concat(dayjs.utc(totalDuration.as('milliseconds')).format('HH:mm:ss'));
-}
-
 function testTotalDuration() {
   const starts: number[] = [1555448042, 1555445266, 1555442823, 1555442419, 1555442385, 1555442011, 1555442003, 1555440982];
   const ends: number[] = [1555448052, 1555445271, 1555445210, 1555442822, 1555442419, 1555442385, 1555442011, 1555442003];
@@ -96,8 +51,6 @@ function testTotalDuration() {
       end: ends[i]
     });
   }
-
-  console.log(displayTotalDuration(timePeriods));
 }
 
 function App() {
@@ -130,6 +83,18 @@ function App() {
       <p>{dayjs().toString()}</p>
       <p>{dayjs().format('YYYY-MM-DD,HH-mm')}</p>
       <p>{dayjs().subtract(7, 'year').format('YYYY-MM-DDTHH:mm')}</p>
+      <div className='break-all bg-white p-6 text-light-gray-text'>
+        Mass spectrometers and other related analytical techniques have continued to improve at a rapid pace over the past few decades. At
+        Bioinformatics Solutions Inc. (BSI), we understand how important it is for researchers to have software that is up to date and can
+        handle the continuously improving data outputs. BSI is best known in the proteomics research community for the development of the
+        software; PEAKS. PEAKS is used to identify and quantify proteins in very complex biological samples with LC-MS. At BSI, our group is
+        continually involved in research and the advancement of our algorithms to provide solutions to facilitate the understanding of life
+        sciences and are designed to elucidate important biological questions. As an instrument vendor neutral company, BSI works directly
+        with each vendor to ensure accurate results and to maximise the information extracted from the raw mass spectrometry data. In
+        addition, we closely collaborate with our users and experts worldwide. This allows us to simultaneously help them with their
+        research and their input helps shape future PEAKS products to continue to improve the solution that can be provided. See BSI
+        Publications for more information on algorithms underlying our software and applications.
+      </div>
       <div className='card'>
         <button onClick={() => setCount(count => count + 1)}>count is {count}</button>
         <p>
