@@ -6,6 +6,7 @@ import { useGetUsersQuery } from '../store/api';
 const LIMIT = 100;
 const ROW_HEIGHT = 50;
 const TABLE_HEIGHT = 400;
+const VISIBLE_PAGES = 5; // Number of page buttons to show
 
 interface Company {
   name: string;
@@ -22,19 +23,25 @@ interface User {
 }
 
 const UserTable: React.FC = () => {
-  const [page, setPage] = React.useState(1);
-  const { data, isLoading, isFetching } = useGetUsersQuery({ page, limit: LIMIT });
-
-  const handlePreviousPage = () => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
+  // Get page from URL query string
+  const getInitialPage = () => {
+    const params = new URLSearchParams(window.location.search);
+    const pageParam = params.get('page');
+    return pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
   };
 
-  const handleNextPage = () => {
-    if (data && page < Math.ceil(1000 / LIMIT)) {
-      setPage(page + 1);
-    }
+  const [page, setPage] = React.useState(getInitialPage);
+  const { data, isLoading, isFetching } = useGetUsersQuery({ page, limit: LIMIT });
+
+  // Update URL when page changes
+  React.useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('page', page.toString());
+    window.history.pushState({}, '', url);
+  }, [page]);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
   };
 
   const Row = React.useCallback(
@@ -74,6 +81,26 @@ const UserTable: React.FC = () => {
   const isFirstPage = page === 1;
   const isLastPage = page >= totalPages;
 
+  // Calculate visible page numbers
+  const getVisiblePages = () => {
+    const pages: number[] = [];
+    const halfVisible = Math.floor(VISIBLE_PAGES / 2);
+    let start = Math.max(1, page - halfVisible);
+    let end = Math.min(totalPages, start + VISIBLE_PAGES - 1);
+
+    // Adjust start if we're near the end
+    if (end - start + 1 < VISIBLE_PAGES) {
+      start = Math.max(1, end - VISIBLE_PAGES + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  const visiblePages = getVisiblePages();
+
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
       {/* Table Header */}
@@ -109,34 +136,81 @@ const UserTable: React.FC = () => {
             (Total: 1000 users)
           </span>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex items-center space-x-1">
           <button
-            onClick={handlePreviousPage}
+            onClick={() => handlePageChange(1)}
+            disabled={isFirstPage || isFetching}
+            className={`
+              px-3 py-1 rounded-md text-sm transition-all duration-200
+              ${isFirstPage || isFetching
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95'
+              }
+            `}
+          >
+            First
+          </button>
+          <button
+            onClick={() => handlePageChange(page - 1)}
             disabled={isFirstPage || isFetching}
             className={`
               p-2 rounded-md transition-all duration-200
               ${isFirstPage || isFetching
                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95'
+                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95'
               }
             `}
             aria-label="Previous page"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={16} />
           </button>
+          
+          {/* Numbered page buttons */}
+          {visiblePages.map((pageNum) => (
+            <button
+              key={pageNum}
+              onClick={() => handlePageChange(pageNum)}
+              disabled={isFetching}
+              className={`
+                px-3 py-1 rounded-md text-sm transition-all duration-200
+                ${pageNum === page
+                  ? 'bg-blue-500 text-white'
+                  : isFetching
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95'
+                }
+              `}
+            >
+              {pageNum}
+            </button>
+          ))}
+
           <button
-            onClick={handleNextPage}
+            onClick={() => handlePageChange(page + 1)}
             disabled={isLastPage || isFetching}
             className={`
               p-2 rounded-md transition-all duration-200
               ${isLastPage || isFetching
                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95'
+                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95'
               }
             `}
             aria-label="Next page"
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={16} />
+          </button>
+          <button
+            onClick={() => handlePageChange(totalPages)}
+            disabled={isLastPage || isFetching}
+            className={`
+              px-3 py-1 rounded-md text-sm transition-all duration-200
+              ${isLastPage || isFetching
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 active:scale-95'
+              }
+            `}
+          >
+            Last
           </button>
         </div>
       </div>
