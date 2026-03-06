@@ -1,6 +1,6 @@
-import React from 'react';
-import { FixedSizeList as List } from 'react-window';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React from 'react';
+import { List, type RowComponentProps } from 'react-window';
 import { useGetUsersQuery } from '../store/api';
 
 const LIMIT = 100;
@@ -45,8 +45,8 @@ const UserTable: React.FC = () => {
   };
 
   const Row = React.useCallback(
-    ({ index, style }: { index: number; style: React.CSSProperties }) => {
-      const user = data?.users[index];
+    ({ index, users, style }: RowComponentProps<{ users: User[] }>) => {
+      const user = users?.[index];
       if (!user) return null;
 
       return (
@@ -114,12 +114,11 @@ const UserTable: React.FC = () => {
       {/* Virtualized Table Body */}
       <div className={`relative ${isFetching ? 'pointer-events-none' : ''}`}>
         <List
-          height={TABLE_HEIGHT}
-          itemCount={data?.users.length || 0}
-          itemSize={ROW_HEIGHT}
-          width="100%"
+          rowHeight={TABLE_HEIGHT}
+          rowCount={data?.users.length || 0}
+          rowComponent={Row}
+          rowProps={{users: data?.users|| []}}
         >
-          {Row}
         </List>
         {isFetching && (
           <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
